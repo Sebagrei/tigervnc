@@ -44,15 +44,18 @@ jobs:
       - name: Build
         working-directory: build
         run: make
-      - name: Install
+      - name: Collect binaries
         working-directory: build
-        env:
-          MSYS2_PATH_TYPE: inherit
-        run: make installer winvnc_installer
+        run: |
+          mkdir -p release/arm64
+          cp vncviewer/vncviewer.exe release/arm64/
+          cp win/winvnc/winvnc4.exe release/arm64/
+          cp win/vncconfig/vncconfig.exe release/arm64/
+          cp win/wm_hooks/wm_hooks.dll release/arm64/
       - uses: actions/upload-artifact@v7
         with:
           name: Windows (arm64)
-          path: build/release/tigervnc*.exe
+          path: build/release/arm64/
       - name: Test
         continue-on-error: true
         working-directory: build
