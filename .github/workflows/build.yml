@@ -55,13 +55,11 @@ jobs:
       - name: Bundle runtime DLLs
         working-directory: build
         run: |
-          set -e
-          ldd release/arm64/*.exe release/arm64/*.dll \
-            | grep -oE '[A-Za-z]:[^ ]*clangarm64[^ ]*\.dll' \
-            | sort -u \
-            | while read -r dep; do
-                cp -n "$dep" release/arm64/
-              done
+          which ldd || true
+          for f in release/arm64/*.exe release/arm64/*.dll; do
+            echo "=== ldd $f ==="
+            ldd "$f"; echo "exit=$?"
+          done
           ls -la release/arm64/
       - uses: actions/upload-artifact@v7
         with:
