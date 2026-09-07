@@ -25,7 +25,7 @@ jobs:
           pacman --sync --noconfirm --needed \
             make mingw-w64-clang-aarch64-toolchain mingw-w64-clang-aarch64-cmake
           pacman --sync --noconfirm --needed \
-            mingw-w64-clang-aarch64-fltk mingw-w64-clang-aarch64-libjpeg-turbo \
+            mingw-w64-clang-aarch64-fltk1.3 mingw-w64-clang-aarch64-libjpeg-turbo \
             mingw-w64-clang-aarch64-gnutls mingw-w64-clang-aarch64-pixman \
             mingw-w64-clang-aarch64-nettle mingw-w64-clang-aarch64-gmp \
             mingw-w64-clang-aarch64-gtest
