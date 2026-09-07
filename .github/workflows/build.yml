@@ -55,11 +55,21 @@ jobs:
       - name: Bundle runtime DLLs
         working-directory: build
         run: |
-          which ldd || true
-          for f in release/arm64/*.exe release/arm64/*.dll; do
-            echo "=== ldd $f ==="
-            ldd "$f"; echo "exit=$?"
-          done
+          deps=$(for f in release/arm64/*.exe release/arm64/*.dll; do ldd "$f"; done \
+            | grep -oE '/clangarm64/bin/[^ ]+\.dll' \
+            | sort -u)
+          echo "$deps" | while read -r dep; do cp -n "$dep" release/arm64/; done
+
+          # api-ms-win-crt-*.dll are Windows API-set forwarders with no real
+          # file even on the target machine, so those are expected here.
+          missing=$(for f in release/arm64/*.exe release/arm64/*.dll; do ldd "$f"; done \
+            | grep -i 'not found' | grep -vi 'api-ms-win-' || true)
+          if [ -n "$missing" ]; then
+            echo "::error::Unresolved dependencies found:"
+            echo "$missing"
+            exit 1
+          fi
+
           ls -la release/arm64/
       - uses: actions/upload-artifact@v7
         with:
