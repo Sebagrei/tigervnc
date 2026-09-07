@@ -52,6 +52,17 @@ jobs:
           cp win/winvnc/winvnc4.exe release/arm64/
           cp win/vncconfig/vncconfig.exe release/arm64/
           cp win/wm_hooks/wm_hooks.dll release/arm64/
+      - name: Bundle runtime DLLs
+        working-directory: build
+        run: |
+          set -e
+          ldd release/arm64/*.exe release/arm64/*.dll \
+            | grep -oE '[A-Za-z]:[^ ]*clangarm64[^ ]*\.dll' \
+            | sort -u \
+            | while read -r dep; do
+                cp -n "$dep" release/arm64/
+              done
+          ls -la release/arm64/
       - uses: actions/upload-artifact@v7
         with:
           name: Windows (arm64)
