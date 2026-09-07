@@ -33,9 +33,7 @@ jobs:
         run: |
           cmake \
             -G "MSYS Makefiles" \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_C_FLAGS="-Wno-error=zero-as-null-pointer-constant" \
-            -DCMAKE_CXX_FLAGS="-Wno-error=zero-as-null-pointer-constant" \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DENABLE_NLS=ON \
             -DENABLE_H264=ON \
             -DENABLE_AUDIO=ON \
