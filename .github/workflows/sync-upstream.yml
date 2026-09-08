@@ -1,0 +1,49 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Merge upstream/master
+        id: merge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          before=$(git rev-parse HEAD)
+
+          git remote add upstream https://github.com/TigerVNC/tigervnc.git
+          git fetch upstream master
+
+          if ! git merge --no-edit upstream/master; then
+            echo "::error::Merging upstream/master produced conflicts. Resolve manually: fetch upstream, merge, and push."
+            git merge --abort
+            exit 1
+          fi
+
+          after=$(git rev-parse HEAD)
+          echo "changed=$([ "$before" != "$after" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Push
+        if: steps.merge.outputs.changed == 'true'
+        run: git push origin HEAD:master
+
+      - name: Trigger arm64 build
+        if: steps.merge.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run build.yml --ref master
