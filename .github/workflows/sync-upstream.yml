@@ -41,9 +41,3 @@ jobs:
       - name: Push
         if: steps.merge.outputs.changed == 'true'
         run: git push origin HEAD:master
-
-      - name: Trigger arm64 build
-        if: steps.merge.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run build.yml --ref master
